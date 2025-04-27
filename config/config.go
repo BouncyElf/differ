@@ -20,7 +20,8 @@ type Config struct {
 }
 
 type ProxyConfig struct {
-	Port int `yaml:"port"`
+	Port      int  `yaml:"port"`
+	EnableLog bool `yaml:"enable_proxy_log"`
 }
 
 func InitConfig(config_file string) error {

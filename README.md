@@ -20,6 +20,8 @@ You can check the demo config below.
 proxy_config:
   // proxy server port
   port: 8888
+  // enable proxy log
+  enable_proxy_log: false
 // async or sync call, optional
 async_call: false
 // the main remote server you want to compare as base standard

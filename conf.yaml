@@ -1,5 +1,6 @@
 proxy_config:
   port: 8888
+  enable_proxy_log: false
 async_call: false
 origin_scheme_and_host: 'https://example.com'
 remote_scheme_and_host: 'https://example.com'

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/BouncyElf/differ/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +16,7 @@ func InitApp() *gin.Engine {
 	// LoggerWithFormatter middleware will write the logs to gin.DefaultWriter
 	// By default gin.DefaultWriter = os.Stdout
 	app.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		if param.StatusCode < 400 {
+		if !config.Conf.ProxyConfig.EnableLog {
 			return ""
 		}
 
