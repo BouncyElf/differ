@@ -1,13 +1,20 @@
 package handlers
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/BouncyElf/differ/config"
 	"github.com/BouncyElf/flow"
@@ -18,6 +25,17 @@ type resp struct {
 	status int
 	header http.Header
 	body   []byte
+}
+
+var (
+	filelocker *sync.Mutex
+	once       sync.Once
+)
+
+func init() {
+	once.Do(func() {
+		filelocker = new(sync.Mutex)
+	})
 }
 
 func Differ(c *gin.Context) {
@@ -46,10 +64,38 @@ func Differ(c *gin.Context) {
 	}
 	if ok := compareResult(origin, remote); !ok {
 		log.Println("****************not equal*********")
-		log.Println("=======================origin resp:")
-		log.Println(origin)
-		log.Println("=======================remote resp:")
-		log.Println(remote)
+		if !compareHeader(origin.header, remote.header) {
+			log.Println("****************header not equal*********")
+			log.Println("=======================origin header:")
+			log.Println(origin.header)
+			log.Println("=======================remote header:")
+			log.Println(remote.header)
+		}
+		if !compareBody(origin.body, remote.body) {
+			log.Println("****************body not equal*********")
+			oct := origin.header.Get("Content-Type")
+			rct := remote.header.Get("Content-Type")
+			if oct == rct && strings.Contains(oct, "json") {
+				filelocker.Lock()
+				filename := fmt.Sprintf("json_diff_%v_%v.html", rand.Intn(10), time.Now().Unix())
+				filelocker.Unlock()
+				html := generateHTML(getJSONContent(origin), getJSONContent(remote))
+				err := os.WriteFile(filename, []byte(html), 0644)
+				if err != nil {
+					panic(err)
+				}
+				absPath, err := filepath.Abs(filename)
+				if err != nil {
+					panic(err)
+				}
+				log.Printf("json diff link: file://%s\n", absPath)
+			} else {
+				log.Println("=======================origin resp:")
+				log.Println(string(origin.body))
+				log.Println("=======================remote resp:")
+				log.Println(string(remote.body))
+			}
+		}
 	} else {
 		log.Println("fully matched")
 	}
@@ -118,11 +164,28 @@ func compareResult(origin, remote *resp) (res bool) {
 	if len(origin.header) != len(remote.header) {
 		return false
 	}
-	for k, v := range origin.header {
+	return compareHeader(origin.header, remote.header) &&
+		compareBody(origin.body, remote.body)
+}
+
+func compareBody(l, r []byte) bool {
+	if len(l) != len(r) {
+		return false
+	}
+	for i := range l {
+		if l[i] != r[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func compareHeader(l, r http.Header) bool {
+	for k, v := range l {
 		if config.Conf.ExcludeHeadersMap[k] {
 			continue
 		}
-		vv := remote.header.Values(k)
+		vv := r.Values(k)
 		if len(v) != len(vv) {
 			return false
 		}
@@ -132,13 +195,30 @@ func compareResult(origin, remote *resp) (res bool) {
 			}
 		}
 	}
-	if len(origin.body) != len(remote.body) {
-		return false
-	}
-	for i := range origin.body {
-		if origin.body[i] != remote.body[i] {
-			return false
-		}
-	}
 	return true
+}
+
+func getJSONContent(data *resp) string {
+	if data == nil {
+		return ""
+	}
+	switch data.header.Get("Content-Encoding") {
+	case "gzip":
+		reader := bytes.NewReader(data.body)
+
+		gzReader, err := gzip.NewReader(reader)
+		if err != nil {
+			return ""
+		}
+		defer gzReader.Close()
+
+		result, err := io.ReadAll(gzReader)
+		if err != nil {
+			return ""
+		}
+
+		return string(result)
+	default:
+		return string(data.body)
+	}
 }
