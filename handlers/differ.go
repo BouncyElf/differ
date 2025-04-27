@@ -94,7 +94,7 @@ func call(c *gin.Context, scheme_and_host string) (*resp, error) {
 			req.Header.Del(k)
 		}
 	}
-	res, err := (&http.Client{}).Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +103,7 @@ func call(c *gin.Context, scheme_and_host string) (*resp, error) {
 		header: res.Header,
 	}
 	bs, err := io.ReadAll(res.Body)
+	defer func() { _ = res.Body.Close() }()
 	if err != nil {
 		return ret, err
 	}
@@ -131,5 +132,13 @@ func compareResult(origin, remote *resp) (res bool) {
 			}
 		}
 	}
-	return string(origin.body) == string(remote.body)
+	if len(origin.body) != len(remote.body) {
+		return false
+	}
+	for i := range origin.body {
+		if origin.body[i] != remote.body[i] {
+			return false
+		}
+	}
+	return true
 }
