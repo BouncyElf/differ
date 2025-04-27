@@ -14,15 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	// header key, the value can be:
-	// 1. remote, means use remote response
-	// 2. local, means use local response
-	// 3. skip, means do not perform abtest
-	ABTestKey          = "x-nb-abtest"
-	ABTestRemoteURLKey = "nb-abtest-remote-url"
-)
-
 type resp struct {
 	status int
 	header http.Header
