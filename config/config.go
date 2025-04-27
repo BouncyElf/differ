@@ -11,10 +11,12 @@ var Conf *Config
 var once sync.Once
 
 type Config struct {
-	ProxyConfig         *ProxyConfig `yaml:"proxy_config"`
-	AsyncCall           bool         `yaml:"async_call"`
-	OriginSchemeAndHost string       `yaml:"origin_scheme_and_host"`
-	RemoteSchemeAndHost string       `yaml:"remote_scheme_and_host"`
+	ProxyConfig         *ProxyConfig    `yaml:"proxy_config"`
+	AsyncCall           bool            `yaml:"async_call"`
+	OriginSchemeAndHost string          `yaml:"origin_scheme_and_host"`
+	RemoteSchemeAndHost string          `yaml:"remote_scheme_and_host"`
+	ExcludeHeaders      []string        `yaml:"exclude_headers"`
+	ExcludeHeadersMap   map[string]bool `yaml:"-"`
 }
 
 type ProxyConfig struct {
@@ -33,6 +35,9 @@ func InitConfig(config_file string) error {
 		if err = yaml.Unmarshal(b, Conf); err != nil {
 			ret_err = err
 			return
+		}
+		for _, v := range Conf.ExcludeHeaders {
+			Conf.ExcludeHeadersMap[v] = true
 		}
 	})
 	return ret_err

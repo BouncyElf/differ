@@ -118,6 +118,9 @@ func compareResult(origin, remote *resp) (res bool) {
 		return false
 	}
 	for k, v := range origin.header {
+		if config.Conf.ExcludeHeadersMap[k] {
+			continue
+		}
 		vv := remote.header.Values(k)
 		if len(v) != len(vv) {
 			return false

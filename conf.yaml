@@ -3,3 +3,5 @@ proxy_config:
 async_call: false
 origin_scheme_and_host: 'https://example.com'
 remote_scheme_and_host: 'https://example.com'
+exclude_headers:
+  - Date
