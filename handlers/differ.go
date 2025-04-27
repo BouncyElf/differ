@@ -50,6 +50,8 @@ func Differ(c *gin.Context) {
 		log.Println(origin)
 		log.Println("=======================remote resp:")
 		log.Println(remote)
+	} else {
+		log.Println("fully matched")
 	}
 	modifyResp(c, origin)
 }

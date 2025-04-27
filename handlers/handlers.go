@@ -29,7 +29,7 @@ func InitApp() *gin.Engine {
 		)
 	}))
 
-	app.Any("/", Differ)
+	app.Any("/*path", Differ)
 
 	return app
 }

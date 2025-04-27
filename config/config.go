@@ -11,14 +11,14 @@ var Conf *Config
 var once sync.Once
 
 type Config struct {
-	ProxyConfig         *ProxyConfig `yaml:"http_config"`
+	ProxyConfig         *ProxyConfig `yaml:"proxy_config"`
 	AsyncCall           bool         `yaml:"async_call"`
 	OriginSchemeAndHost string       `yaml:"origin_scheme_and_host"`
 	RemoteSchemeAndHost string       `yaml:"remote_scheme_and_host"`
 }
 
 type ProxyConfig struct {
-	Port int `yaml:"proxy_port"`
+	Port int `yaml:"port"`
 }
 
 func InitConfig(config_file string) error {
