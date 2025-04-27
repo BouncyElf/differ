@@ -36,6 +36,7 @@ func InitConfig(config_file string) error {
 			ret_err = err
 			return
 		}
+		Conf.ExcludeHeadersMap = make(map[string]bool, len(Conf.ExcludeHeaders))
 		for _, v := range Conf.ExcludeHeaders {
 			Conf.ExcludeHeadersMap[v] = true
 		}
