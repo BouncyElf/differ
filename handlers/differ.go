@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"differ/config"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/BouncyElf/differ/config"
 	"github.com/BouncyElf/flow"
 	"github.com/gin-gonic/gin"
 )

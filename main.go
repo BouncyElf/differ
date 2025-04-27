@@ -1,11 +1,12 @@
 package main
 
 import (
-	"differ/config"
-	"differ/handlers"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/BouncyElf/differ/config"
+	"github.com/BouncyElf/differ/handlers"
 )
 
 func main() {
