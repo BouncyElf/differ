@@ -17,9 +17,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Invalid Config file: %v", err)
 	}
+
 	app := handlers.InitApp()
 	p := config.Conf.ProxyConfig.Port
 	log.Printf("proxy server start in: localhost:%d", p)
 	app.Run(fmt.Sprintf(":%d", p))
-
 }

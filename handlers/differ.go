@@ -79,7 +79,12 @@ func Differ(c *gin.Context) {
 				filelocker.Lock()
 				filename := fmt.Sprintf("json_diff_%v_%v.html", rand.Intn(10), time.Now().Unix())
 				filelocker.Unlock()
-				html := generateHTML(getJSONContent(origin), getJSONContent(remote))
+				ojson, rjson := getJSONContent(origin), getJSONContent(remote)
+				if ojson == rjson {
+					log.Println("false alarm, after ungzip it's fully match")
+					return
+				}
+				html := generateHTML(ojson, rjson)
 				err := os.WriteFile(filename, []byte(html), 0644)
 				if err != nil {
 					panic(err)

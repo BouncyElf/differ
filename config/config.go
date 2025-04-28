@@ -1,6 +1,9 @@
 package config
 
 import (
+	"errors"
+	"fmt"
+	"net/url"
 	"os"
 	"sync"
 
@@ -41,6 +44,27 @@ func InitConfig(config_file string) error {
 		for _, v := range Conf.ExcludeHeaders {
 			Conf.ExcludeHeadersMap[v] = true
 		}
+		if err := CheckConfig(); err != nil {
+			panic(err)
+		}
 	})
 	return ret_err
+}
+
+func CheckConfig() error {
+	if Conf == nil {
+		return errors.New("config mustn't be nil")
+	}
+	if Conf.ProxyConfig == nil {
+		return errors.New("need proxy config")
+	}
+	_, err := url.Parse(Conf.OriginSchemeAndHost)
+	if err != nil {
+		return fmt.Errorf("parse origin_scheme_and_host err: %v", err)
+	}
+	_, err = url.Parse(Conf.RemoteSchemeAndHost)
+	if err != nil {
+		return fmt.Errorf("parse remote_scheme_and_host err: %v", err)
+	}
+	return nil
 }
