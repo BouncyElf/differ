@@ -21,9 +21,6 @@ proxy_config:
   port: 8888
   enable_proxy_log: false
 
-# async or sync call, optional
-async_call: false
-
 # the main remote server you want to compare as base standard
 origin_scheme_and_host: 'https://example.com'
 
@@ -34,4 +31,7 @@ remote_scheme_and_host: 'https://example.com'
 # NOTE: highly recommand exclude `Date` header cause it will cause diff in most cases
 exclude_headers:
   - Date
+
+# async or sync call, optional
+async_call: false
 ```
